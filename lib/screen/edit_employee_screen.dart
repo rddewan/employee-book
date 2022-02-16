@@ -5,17 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' as drift;
 
-class AddEmployeeScreen extends StatefulWidget {
-  const AddEmployeeScreen({Key? key}) : super(key: key);
+class EditEmployeeScreen extends StatefulWidget {
+  final int id;
+  const EditEmployeeScreen({required this.id, Key? key}) : super(key: key);
 
   @override
-  State<AddEmployeeScreen> createState() => _AddEmployeeScreenState();
+  State<EditEmployeeScreen> createState() => _EditEmployeeScreenState();
   
 }
 
-class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
+class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
   final _formKey = GlobalKey<FormState>();
   late AppDb _db;
+  late EmployeeData _employeeData;
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -26,7 +28,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   void initState() {    
     super.initState();
 
-    _db = AppDb();    
+    _db = AppDb();
+    getEmployee();      
   }
 
   @override
@@ -43,15 +46,20 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Employee'),
+        title: const Text('Edit Employee'),
         centerTitle: true,
         actions: [
           IconButton(
             onPressed: () {
-              addEmployee();
+              editEmployee();
             }, 
             icon: const Icon(Icons.save)
-          )
+          ),
+          IconButton(
+            onPressed: () {
+              deleteEmployee();
+            }, 
+            icon: const Icon(Icons.delete))
         ],
       ),
       body: Padding(
@@ -116,31 +124,59 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
 
   }
  
-  void addEmployee(){
+  void editEmployee(){
     final isValid = _formKey.currentState?.validate();
-
     if (isValid != null && isValid) {
-      final entity = EmployeeCompanion(
+          final entity = EmployeeCompanion(
+      id: drift.Value(widget.id),
       userName: drift.Value(_userNameController.text),
       firstName: drift.Value(_firstNameController.text),
       lastName: drift.Value(_lastNameController.text),
       dateOfBirth: drift.Value(_dateOfBith!),
-      );
+    );
 
-      _db.insertEmployee(entity).then((value) => ScaffoldMessenger.of(context)
-          .showMaterialBanner(
-            MaterialBanner(
-              backgroundColor: Colors.pink,
-              content: Text('New employee inserted: $value',style: const TextStyle(color: Colors.white)), 
-              actions: [
-                TextButton(
-                  onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
-                  child: const Text('Close',style: TextStyle(color: Colors.white),))
-              ],
-            ),
-          ),
-        );      
-    }  
+    _db.updateEmployee(entity).then((value) => ScaffoldMessenger.of(context)
+      .showMaterialBanner(
+        MaterialBanner(
+          backgroundColor: Colors.pink,
+          content: Text('Employee updated : $value',style: const TextStyle(color: Colors.white)), 
+          actions: [
+            TextButton(
+              onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+              child: const Text('Close',style: TextStyle(color: Colors.white),))
+          ],
+        ),
+        ),
+      );
+    }
   }
+
+  void deleteEmployee(){
+    _db.deleteEmployee(widget.id).then((value) =>ScaffoldMessenger.of(context)
+    .showMaterialBanner(
+      MaterialBanner(
+        backgroundColor: Colors.pink,
+        content: Text('Employee deleted : $value',style: const TextStyle(color: Colors.white)), 
+        actions: [
+          TextButton(
+            onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+            child: const Text('Close',style: TextStyle(color: Colors.white),))
+        ],
+      ),
+    ),
+    );
+
+  }
+
+  Future<void> getEmployee() async {
+    _employeeData = await _db.getEmployee(widget.id);
+    _userNameController.text = _employeeData.userName;
+    _firstNameController.text = _employeeData.firstName;
+    _lastNameController.text = _employeeData.lastName;
+    _dateOfBirthController.text = _employeeData.dateOfBirth.toIso8601String();
+
+  }
+
+  
 }
 

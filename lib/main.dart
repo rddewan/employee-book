@@ -1,5 +1,4 @@
 import 'package:employee_book/route/route_generator.dart';
-import 'package:employee_book/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,6 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
        
