@@ -4,6 +4,7 @@ import 'package:employee_book/widget/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:drift/drift.dart' as drift;
+import 'package:provider/provider.dart';
 
 class AddEmployeeScreen extends StatefulWidget {
   const AddEmployeeScreen({Key? key}) : super(key: key);
@@ -15,7 +16,7 @@ class AddEmployeeScreen extends StatefulWidget {
 
 class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   final _formKey = GlobalKey<FormState>();
-  late AppDb _db;
+  
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -24,14 +25,11 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
 
   @override
   void initState() {    
-    super.initState();
-
-    _db = AppDb();    
+    super.initState();    
   }
 
   @override
-  void dispose() {
-    _db.close();
+  void dispose() {    
     _userNameController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
@@ -47,7 +45,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
         centerTitle: true,
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () {              
               addEmployee();
             }, 
             icon: const Icon(Icons.save)
@@ -127,7 +125,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       dateOfBirth: drift.Value(_dateOfBith!),
       );
 
-      _db.insertEmployee(entity).then((value) => ScaffoldMessenger.of(context)
+      Provider.of<AppDb>(context, listen: false).insertEmployee(entity).then((value) => ScaffoldMessenger.of(context)
           .showMaterialBanner(
             MaterialBanner(
               backgroundColor: Colors.pink,

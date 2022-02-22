@@ -1,4 +1,6 @@
-import 'package:employee_book/data/local/db/app_db.dart';
+
+import 'package:employee_book/screen/employee_future.dart';
+import 'package:employee_book/screen/employee_stream.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -9,98 +11,61 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
-  late AppDb _db;
+  int index  = 0;
+  //late AppDb _db;
+  final pages = const [
+    EmployeeFutureScreen(),
+    EmployeeStreamScreen()
+  ];
 
   @override
   void initState() {
     super.initState();
 
-    _db = AppDb();
+    //_db = AppDb();
 
   }
 @override
   void dispose() {
-    _db.close();
+    //_db.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const  Text('Home'),
-        centerTitle: true,
-      ),
-      body: FutureBuilder<List<EmployeeData>>(
-        future: _db.getEmployees(),
-        builder: (context, snapshot) {
-          final List<EmployeeData>? employees = snapshot.data;
-
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
-            );
-          }
-          if (employees != null) {
-
-            return ListView.builder(
-              itemCount: employees.length,
-              itemBuilder: (context, index) {
-              
-              final employee = employees[index];
-              return GestureDetector(
-                onTap: ()  {
-                  Navigator.pushNamed(context, '/edit_employee',arguments: employee.id);
-                },
-                child: Card(
-                //color: Colors.grey.shade400,
-                shape: const RoundedRectangleBorder(
-                  side: BorderSide(
-                    color: Colors.green,
-                    style: BorderStyle.solid,
-                    width: 1.2
-                  ),
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16.0),
-                    bottomRight: Radius.circular(16.0)
-                  )
-
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(employee.id.toString()),
-                      Text(employee.userName.toString(),style: const TextStyle(color: Colors.black),),
-                      Text(employee.firstName.toString(),style: const TextStyle(color: Colors.black),),
-                      Text(employee.lastName.toString(),style: const TextStyle(color: Colors.black),),
-                      Text(employee.dateOfBirth.toString(),style: const TextStyle(color: Colors.black),),
-                    ],
-                  ),
-                ),
-              ),
-            );
-            });
-          }
-
-          return const Text('No data found');
-
-        },
-      ),
+    return Scaffold(      
+      body: pages[index],
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () {
           Navigator.pushNamed(context, '/add_employee');
         }, 
         icon: const Icon(Icons.add),
-        label: const Text('Add Employee')),
+        label: const Text('Add Employee'),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: index,
+        onTap: (value) {
+          setState(() {
+            index = value;
+          });
+        },
+        backgroundColor: Colors.blue.shade300,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white30,
+        showSelectedLabels: false,
+        showUnselectedLabels: true,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            activeIcon: Icon(Icons.list_outlined),
+            label: 'Employee Future'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            activeIcon: Icon(Icons.list_outlined),
+            label: 'Employee Stream'
+          )
+        ]),
     );
   }
 }

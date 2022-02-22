@@ -207,9 +207,10 @@ class EmployeeCompanion extends UpdateCompanion<EmployeeData> {
 
 class $EmployeeTable extends Employee
     with TableInfo<$EmployeeTable, EmployeeData> {
-  final GeneratedDatabase _db;
+  @override
+  final GeneratedDatabase attachedDatabase;
   final String? _alias;
-  $EmployeeTable(this._db, [this._alias]);
+  $EmployeeTable(this.attachedDatabase, [this._alias]);
   final VerificationMeta _idMeta = const VerificationMeta('id');
   @override
   late final GeneratedColumn<int?> id = GeneratedColumn<int?>(
@@ -292,7 +293,7 @@ class $EmployeeTable extends Employee
 
   @override
   $EmployeeTable createAlias(String alias) {
-    return $EmployeeTable(_db, alias);
+    return $EmployeeTable(attachedDatabase, alias);
   }
 }
 
