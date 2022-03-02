@@ -1,4 +1,5 @@
 import 'package:employee_book/data/local/db/app_db.dart';
+import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:employee_book/widget/custom_date_picker_form_field.dart';
 import 'package:employee_book/widget/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
@@ -23,11 +24,14 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _dateOfBirthController = TextEditingController();
-  DateTime? _dateOfBith;
+  DateTime? _dateOfBirth;
+   late EmployeeChangeNotifier _employeeChangeNotifier;
 
   @override
   void initState() {    
     super.initState();
+    _employeeChangeNotifier = Provider.of<EmployeeChangeNotifier>(context,listen: false);  
+    _employeeChangeNotifier.addListener(providerListener);
     getEmployee();      
   }
 
@@ -36,7 +40,8 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     _userNameController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _dateOfBirthController.dispose();    
+    _dateOfBirthController.dispose();   
+    _employeeChangeNotifier.dispose(); 
     super.dispose();
   }
   
@@ -94,7 +99,7 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     final initialDate = DateTime.now();
     final newDate = await showDatePicker(
       context: context, 
-      initialDate:  _dateOfBith ?? initialDate, 
+      initialDate:  _dateOfBirth ?? initialDate, 
       firstDate: DateTime(DateTime.now().year - 100), 
       lastDate: DateTime(DateTime.now().year  + 1),
       builder: (context, child) => Theme(
@@ -115,7 +120,7 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     }
 
     setState(() {
-      _dateOfBith = newDate;
+      _dateOfBirth = newDate;
       String dob = DateFormat('dd/MM/yyyy').format(newDate);
       _dateOfBirthController.text = dob;
     });
@@ -130,40 +135,83 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
       userName: drift.Value(_userNameController.text),
       firstName: drift.Value(_firstNameController.text),
       lastName: drift.Value(_lastNameController.text),
-      dateOfBirth: drift.Value(_dateOfBith!),
+      dateOfBirth: drift.Value(_dateOfBirth!),
     );
 
-    Provider.of<AppDb>(context, listen: false).updateEmployee(entity).then((value) => ScaffoldMessenger.of(context)
-      .showMaterialBanner(
-        MaterialBanner(
-          backgroundColor: Colors.pink,
-          content: Text('Employee updated : $value',style: const TextStyle(color: Colors.white)), 
-          actions: [
-            TextButton(
-              onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
-              child: const Text('Close',style: TextStyle(color: Colors.white),))
-          ],
-        ),
-        ),
-      );
+    context.read<EmployeeChangeNotifier>().updateEmployee(entity);
+
+    // Provider.of<AppDb>(context, listen: false).updateEmployee(entity).then((value) => ScaffoldMessenger.of(context)
+    //   .showMaterialBanner(
+    //     MaterialBanner(
+    //       backgroundColor: Colors.pink,
+    //       content: Text('Employee updated : $value',style: const TextStyle(color: Colors.white)), 
+    //       actions: [
+    //         TextButton(
+    //           onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+    //           child: const Text('Close',style: TextStyle(color: Colors.white),))
+    //       ],
+    //     ),
+    //     ),
+    //   );
     }
   }
 
   void deleteEmployee(){
-    Provider.of<AppDb>(context, listen: false).deleteEmployee(widget.id).then((value) =>ScaffoldMessenger.of(context)
+    context.read<EmployeeChangeNotifier>().deleteEmployee(widget.id);
+    // Provider.of<AppDb>(context, listen: false).deleteEmployee(widget.id).then((value) =>ScaffoldMessenger.of(context)
+    // .showMaterialBanner(
+    //   MaterialBanner(
+    //     backgroundColor: Colors.pink,
+    //     content: Text('Employee deleted : $value',style: const TextStyle(color: Colors.white)), 
+    //     actions: [
+    //       TextButton(
+    //         onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+    //         child: const Text('Close',style: TextStyle(color: Colors.white),))
+    //     ],
+    //   ),
+    // ),
+    // );
+
+  }
+
+  void providerListener(){
+    if (_employeeChangeNotifier.isUpdated) {
+      listenUpdate();
+    }
+    if (_employeeChangeNotifier.isDeleted) {
+      listenDelete();
+    }
+  }
+
+  void listenDelete() {
+    ScaffoldMessenger.of(context)
     .showMaterialBanner(
       MaterialBanner(
         backgroundColor: Colors.pink,
-        content: Text('Employee deleted : $value',style: const TextStyle(color: Colors.white)), 
+        content: const Text('Employee deleted ',style:  TextStyle(color: Colors.white)), 
         actions: [
           TextButton(
             onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
             child: const Text('Close',style: TextStyle(color: Colors.white),))
         ],
       ),
-    ),
     );
+  }
 
+  void listenUpdate(){
+    ScaffoldMessenger.of(context)
+      .showMaterialBanner(
+        MaterialBanner(
+          backgroundColor: Colors.pink,
+          content: const Text('Employee updated ',style:  TextStyle(color: Colors.white)), 
+          actions: [
+            TextButton(
+              onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+              child: const Text('Close',style: TextStyle(color: Colors.white),))
+          ],
+        ),
+      );
+      
   }
 
   Future<void> getEmployee() async {

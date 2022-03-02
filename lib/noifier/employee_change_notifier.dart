@@ -25,28 +25,32 @@ class EmployeeChangeNotifier extends ChangeNotifier {
   bool get  isUpdated => _isUpdated;
   bool _isDeleted = false;
   bool get  isDeleted => _isDeleted;
-
+  bool _isLoading = false;
+  bool get  isLoading => _isLoading;
 
   void getEmployeeFuture() {
+    _isLoading = true;
 
     _appDb?.getEmployees()
       .then((value) {
         _employeeListFuture = value;
+        _isLoading = false;
+        notifyListeners();
       })
       .onError((error, stackTrace) {
         _error = error.toString();
-      });
-
-    notifyListeners();
+        _isLoading = false;
+        notifyListeners();
+      });    
   }
 
   void getEmployeeStream() {
-
+    _isLoading = true;
     _appDb?.getEmployeeStream()
       .listen((event) {
         _employeeListStream = event;
       }); 
-
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -68,12 +72,13 @@ class EmployeeChangeNotifier extends ChangeNotifier {
     _appDb?.insertEmployee(entity)
       .then((value) {
         _isAdded = value >= 1 ? true : false;
+        notifyListeners();
       })
       .onError((error, stackTrace) {
         _error = error.toString();
+        notifyListeners();
       });
-
-    notifyListeners();
+    
   }
 
   void updateEmployee(EmployeeCompanion entity) {

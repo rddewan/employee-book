@@ -1,5 +1,6 @@
 
 import 'package:employee_book/screen/employee_future.dart';
+import 'package:employee_book/screen/employee_notifier_future.dart';
 import 'package:employee_book/screen/employee_stream.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +15,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int index  = 0;
   //late AppDb _db;
   final pages = const [
-    EmployeeFutureScreen(),
+    EmployeeNotifierFutureScreen(),
     EmployeeStreamScreen()
   ];
 
