@@ -25,7 +25,7 @@ class _EmployeeNotifierFutureScreenState extends State<EmployeeNotifierFutureScr
   Widget build(BuildContext context) {
     debugPrint('BuildContext');
     final isLoading = context.select<EmployeeChangeNotifier,bool>((notifier) => notifier.isLoading);
-    final employees = context.select<EmployeeChangeNotifier,List<EmployeeData>>((notifier) => notifier.employeeListFuture);
+    //final employees = context.select<EmployeeChangeNotifier,List<EmployeeData>>((notifier) => notifier.employeeListFuture);
     return Scaffold(
       appBar: AppBar(
         title: const  Text('Employee Future'),
@@ -35,11 +35,12 @@ class _EmployeeNotifierFutureScreenState extends State<EmployeeNotifierFutureScr
         const Center(
           child: CircularProgressIndicator(),
         ) :
-        ListView.builder(
-              itemCount: employees.length,
-              itemBuilder: (context, index) {
-              
-              final employee = employees[index];
+        Consumer<EmployeeChangeNotifier>(builder: (context,notifier,child) {   
+          debugPrint('Consumer widget');       
+          return ListView.builder(
+              itemCount: notifier.employeeListFuture.length,
+              itemBuilder: (context, index) {              
+              final employee = notifier.employeeListFuture[index];
               return GestureDetector(
                 onTap: ()  {
                   Navigator.pushNamed(context, '/edit_employee',arguments: employee.id);
@@ -74,8 +75,8 @@ class _EmployeeNotifierFutureScreenState extends State<EmployeeNotifierFutureScr
               ),
             );
             },
-          ),
-        
+          );        
+        },),       
           
       );    
       
