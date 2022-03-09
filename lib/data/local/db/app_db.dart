@@ -73,4 +73,20 @@ class AppDb extends _$AppDb {
     return await (delete(employee)..where((tbl) => tbl.id.equals(id))).go();
   }
 
+  // insert the emp address
+  Future<int> insertAddress(EmployeeAddressCompanion entity) async {
+    return await into(employeeAddress).insert(entity);
+  }
+
+  // get the emp address by emp id
+  Stream<List<emp_address>> getEmployeeAddress(int id) {
+    return (select(employeeAddress)..where((tbl) => tbl.employee.equals(id))).watch();
+  }
+
+  // get the list of address
+  Stream<List<emp_address>> getEmployeeAddressList() {
+    return select(employeeAddress).watch();
+  }
+
+  
 }
