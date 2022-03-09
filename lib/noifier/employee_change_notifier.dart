@@ -27,6 +27,8 @@ class EmployeeChangeNotifier extends ChangeNotifier {
   bool get  isDeleted => _isDeleted;
   bool _isLoading = false;
   bool get  isLoading => _isLoading;
+  bool _isActive = false;
+  bool get isActive => _isActive;
 
   void getEmployeeFuture() {
     _isLoading = true;
@@ -59,12 +61,13 @@ class EmployeeChangeNotifier extends ChangeNotifier {
     _appDb?.getEmployee(id)
       .then((value) {
         _employeeData = value;
+        setIsActive(value.isActive == 1 ? true : false);
+        notifyListeners();
       })
       .onError((error, stackTrace) {
         _error = error.toString();
-      });
-
-    notifyListeners();
+        notifyListeners();
+      });   
 
   }
 
@@ -85,25 +88,53 @@ class EmployeeChangeNotifier extends ChangeNotifier {
     _appDb?.updateEmployee(entity)
     .then((value) {
       _isUpdated = value;
+       notifyListeners();
     })
     .onError((error, stackTrace) {
       _error = error.toString();
+       notifyListeners();
     });
 
-    notifyListeners();
+   
   }
 
   void deleteEmployee(int id) {
     _appDb?.deleteEmployee(id)
       .then((value) {
-        _isDeleted = value == 1 ? true : false;
+        if (value == 0) {
+          _error = 'No record was found';
+        }
+        else {
+          _isDeleted = true;
+        }        
+        notifyListeners();
+
       })
       .onError((error, stackTrace) {
         _error = error.toString();
-      });
-    
-    notifyListeners();
+        notifyListeners();
+      });  
 
   }
 
+  void setIsActive(bool value) {
+    _isActive = value;
+    notifyListeners();
+  }
+
+  void setIsUpdated(bool value) {
+    _isUpdated = value;
+    notifyListeners();
+  }
+
+  void setIsDeleted(bool value) {
+    _isDeleted = value;
+    notifyListeners();
+  }
+
+  void setErrorMsg(String value) {
+    _error = value;
+    notifyListeners();
+  }
+  
 }

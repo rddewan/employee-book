@@ -25,14 +25,17 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _dateOfBirthController = TextEditingController();
   DateTime? _dateOfBirth;
-   late EmployeeChangeNotifier _employeeChangeNotifier;
+  late EmployeeChangeNotifier _employeeChangeNotifier;
+  int _isActive = 0;
+  int _id = 0;
+  
 
   @override
   void initState() {    
     super.initState();
     _employeeChangeNotifier = Provider.of<EmployeeChangeNotifier>(context,listen: false);  
     _employeeChangeNotifier.addListener(providerListener);
-    getEmployee();      
+    //getEmployee();      
   }
 
   @override
@@ -41,7 +44,8 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _dateOfBirthController.dispose();   
-    _employeeChangeNotifier.dispose(); 
+    //_employeeChangeNotifier.dispose(); 
+    _employeeChangeNotifier.removeListener(providerListener);
     super.dispose();
   }
   
@@ -69,28 +73,61 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                CustomTextFormField(controller: _userNameController, txtLable: 'User Name',),
-                const SizedBox(height: 8.0,),
-                CustomTextFormField(controller: _firstNameController, txtLable: 'First Name',),
-                const SizedBox(height: 8.0,),
-                CustomTextFormField(controller: _lastNameController, txtLable: 'Last Name',),
-                const SizedBox(height: 8.0,),
-                CustomDatePickerFormFiled(
-                  controller: _dateOfBirthController, txtLabel: 'Date of birth', callback: () {
-                    pickDateOfBirth(context);
-                  }),
-                const SizedBox(height: 8.0,),    
-                ],
-              )
-            ),
-                 
+            Selector<EmployeeChangeNotifier,EmployeeData?>(
+              selector: (context,notifier) => notifier.employeeData,
+              builder: (context,data,child) {
+                setEmployee(data);
+                return Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                    CustomTextFormField(controller: _userNameController, txtLable: 'User Name',),
+                    const SizedBox(height: 8.0,),
+                    CustomTextFormField(controller: _firstNameController, txtLable: 'First Name',),
+                    const SizedBox(height: 8.0,),
+                    CustomTextFormField(controller: _lastNameController, txtLable: 'Last Name',),
+                    const SizedBox(height: 8.0,),
+                    CustomDatePickerFormFiled(
+                      controller: _dateOfBirthController, txtLabel: 'Date of birth', callback: () {
+                        pickDateOfBirth(context);
+                      }),
+                    const SizedBox(height: 8.0,),
+                    Selector<EmployeeChangeNotifier, bool>(
+                      selector: (context,notifier) => notifier.isActive,
+                      builder: (context,value,child) {
+                        _isActive = value ? 1 : 0;
+                        return CheckboxListTile(
+                          title: const Text('isActive'),
+                          activeColor: Colors.pink,
+                          value: value, 
+                          onChanged: (value) {
+                            context.read<EmployeeChangeNotifier>().setIsActive(value ?? false);                        
+                          },
+                        );
+
+                      },
+                      
+                    ),
+
+                        
+                    ],
+                  )
+                );            
+
+              },
+
+            )
+                
           ],
 
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.pushNamed(context, '/add_address', arguments: _id);
+        }, 
+        label: const Text('Address'),
+        icon: const Icon(Icons.add)
       ),
     );
   }
@@ -136,6 +173,7 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
       firstName: drift.Value(_firstNameController.text),
       lastName: drift.Value(_lastNameController.text),
       dateOfBirth: drift.Value(_dateOfBirth!),
+      isActive: drift.Value(_isActive),
     );
 
     context.read<EmployeeChangeNotifier>().updateEmployee(entity);
@@ -181,6 +219,9 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
     if (_employeeChangeNotifier.isDeleted) {
       listenDelete();
     }
+    if (_employeeChangeNotifier.error != '') {
+      listenError(_employeeChangeNotifier.error);
+    }
   }
 
   void listenDelete() {
@@ -191,11 +232,15 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
         content: const Text('Employee deleted ',style:  TextStyle(color: Colors.white)), 
         actions: [
           TextButton(
-            onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+            onPressed: ()  {
+              ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+              context.read<EmployeeChangeNotifier>().setIsDeleted(false);
+            }, 
             child: const Text('Close',style: TextStyle(color: Colors.white),))
         ],
       ),
     );
+    
   }
 
   void listenUpdate(){
@@ -206,14 +251,49 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
           content: const Text('Employee updated ',style:  TextStyle(color: Colors.white)), 
           actions: [
             TextButton(
-              onPressed: () => ScaffoldMessenger.of(context).hideCurrentMaterialBanner(), 
+              onPressed: () {
+                 ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                 context.read<EmployeeChangeNotifier>().setIsUpdated(false);
+              }, 
               child: const Text('Close',style: TextStyle(color: Colors.white),))
           ],
         ),
       );
-      
   }
 
+  void listenError(String errorMsg){
+    ScaffoldMessenger.of(context)
+      .showMaterialBanner(
+        MaterialBanner(
+          backgroundColor: Colors.pink,
+          content: Text(errorMsg,style: const TextStyle(color: Colors.white)), 
+          actions: [
+            TextButton(
+              onPressed: () {
+                 ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                 context.read<EmployeeChangeNotifier>().setErrorMsg('');
+              }, 
+              child: const Text('Close',style: TextStyle(color: Colors.white),))
+          ],
+        ),
+      );
+  }
+
+  void setEmployee(EmployeeData? data) {   
+    if (data != null) {
+       _userNameController.text = data.userName;
+      _firstNameController.text = data.firstName;
+      _lastNameController.text = data.lastName;
+      _dateOfBirthController.text = data.dateOfBirth.toIso8601String();
+      _id = data.id;
+      
+
+    } 
+   
+
+
+  }
+  
   Future<void> getEmployee() async {
     _employeeData = await Provider.of<AppDb>(context, listen: false).getEmployee(widget.id);
     _userNameController.text = _employeeData.userName;

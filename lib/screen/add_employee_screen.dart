@@ -24,6 +24,7 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
   final TextEditingController _dateOfBirthController = TextEditingController();
   DateTime? _dateOfBirth;
   late EmployeeChangeNotifier _employeeChangeNotifier;
+  bool _isActive = false;
 
   @override
   void initState() {    
@@ -74,7 +75,17 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
                   controller: _dateOfBirthController, txtLabel: 'Date of birth', callback: () {
                     pickDateOfBirth(context);
                   }),
-                const SizedBox(height: 8.0,),    
+                const SizedBox(height: 8.0,),  
+                CheckboxListTile(
+                  title: const Text('isActive'),
+                  activeColor: Colors.pink,
+                  value: _isActive, 
+                  onChanged: (value) {
+                    setState(() {
+                      _isActive = value ?? false;
+                    });
+                  }
+                ), 
                 ],
               )
             ),
@@ -126,7 +137,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
       userName: drift.Value(_userNameController.text),
       firstName: drift.Value(_firstNameController.text),
       lastName: drift.Value(_lastNameController.text),
-      dateOfBirth: drift.Value(_dateOfBirth!),
+      dateOfBirth: drift.Value(_dateOfBirth!), 
+      isActive: drift.Value(_isActive ? 1 : 0)    
       );
 
       context.read<EmployeeChangeNotifier>().createEmployee(entity);

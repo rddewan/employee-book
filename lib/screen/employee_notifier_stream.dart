@@ -25,14 +25,19 @@ class _EmployeeNotifierStreamScreenState extends State<EmployeeNotifierStreamScr
 
   @override
   Widget build(BuildContext context) {
-    final employees = context.watch<EmployeeChangeNotifier>().employeeListStream;
+    debugPrint('Stream BuildContext');
+    //final employees = context.watch<EmployeeChangeNotifier>().employeeListStream;
 
     return Scaffold(
       appBar: AppBar(
         title:  const Text('Employee Stream'),
         centerTitle: true,
       ),
-      body: ListView.builder(
+      body: Selector<EmployeeChangeNotifier,List<EmployeeData>> (
+        selector: (context, notifier) => notifier.employeeListStream,
+        builder: (context,employees,child) {
+          debugPrint('Selector BuildContext');
+          return ListView.builder(
               itemCount: employees.length,
               itemBuilder: (context, index) {
               
@@ -71,8 +76,10 @@ class _EmployeeNotifierStreamScreenState extends State<EmployeeNotifierStreamScr
               ),
           );
         },
-      ),
-    );
+      );
+    
+      },)
+      );
   }
 
           

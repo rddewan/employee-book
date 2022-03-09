@@ -43,6 +43,7 @@ class _EmployeeNotifierFutureScreenState extends State<EmployeeNotifierFutureScr
               final employee = notifier.employeeListFuture[index];
               return GestureDetector(
                 onTap: ()  {
+                  context.read<EmployeeChangeNotifier>().getSingleEmployee(employee.id);
                   Navigator.pushNamed(context, '/edit_employee',arguments: employee.id);
                 },
                 child: Card(

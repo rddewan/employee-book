@@ -1,8 +1,11 @@
 
+import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:employee_book/screen/employee_future.dart';
 import 'package:employee_book/screen/employee_notifier_future.dart';
+import 'package:employee_book/screen/employee_notifier_stream.dart';
 import 'package:employee_book/screen/employee_stream.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({ Key? key }) : super(key: key);
@@ -16,7 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //late AppDb _db;
   final pages = const [
     EmployeeNotifierFutureScreen(),
-    EmployeeStreamScreen()
+    EmployeeNotifierStreamScreen()
+    //EmployeeStreamScreen()
   ];
 
   @override
@@ -46,6 +50,9 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: index,
         onTap: (value) {
+          if (value == 1) {
+            context.read<EmployeeChangeNotifier>().getEmployeeStream();
+          }
           setState(() {
             index = value;
           });

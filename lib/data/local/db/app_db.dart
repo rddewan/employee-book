@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:employee_book/data/local/entity/employee_address.dart';
 import 'package:employee_book/data/local/entity/employee_entity.dart';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 
@@ -19,13 +21,32 @@ LazyDatabase _openConnection(){
 }
 
 
-@DriftDatabase(tables: [Employee])
+@DriftDatabase(tables: [Employee, EmployeeAddress])
 class AppDb extends _$AppDb {
 
   AppDb() : super(_openConnection());
 
   @override 
-  int get schemaVersion => 1;
+  int get schemaVersion => 3;
+
+  @override
+  MigrationStrategy get migration => MigrationStrategy(
+    beforeOpen: (details) async {
+      debugPrint('beforeOpen');
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+    onUpgrade: (m, from, to)  async {
+      
+      if (from == 1) {
+        await m.addColumn(employee, employee.isActive);
+      }
+      if (from == 2) {
+        debugPrint('migration from 2 - 3');
+        await m.createTable(employeeAddress);
+      }
+    },
+
+  );
 
   // Get the list of employee
   Future<List<EmployeeData>> getEmployees() async {

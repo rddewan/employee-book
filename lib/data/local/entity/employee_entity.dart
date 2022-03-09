@@ -9,4 +9,5 @@ class Employee extends Table{
   TextColumn get firstName => text().named('first_name')();
   TextColumn get lastName => text().named('last_name')();
   DateTimeColumn get dateOfBirth => dateTime().named('date_of_birth')();
+  IntColumn get isActive => integer().named('is_active').nullable()();
 }

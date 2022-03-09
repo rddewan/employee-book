@@ -1,4 +1,5 @@
 
+import 'package:employee_book/screen/add_address.dart';
 import 'package:employee_book/screen/add_employee_screen.dart';
 import 'package:employee_book/screen/edit_employee_screen.dart';
 import 'package:employee_book/screen/home_screen.dart';
@@ -18,8 +19,12 @@ class RouteGenerator {
         if (args is int) {
           return MaterialPageRoute(builder: (_) =>  EditEmployeeScreen(id: args)); 
         }
-        return _errorRoute();
-              
+        return _errorRoute(); 
+        case '/add_address':
+        if (args is int) {
+          return MaterialPageRoute(builder: (_) =>  AddAddress(id: args)); 
+        }
+        return _errorRoute();          
       default:
         return _errorRoute();
     }
