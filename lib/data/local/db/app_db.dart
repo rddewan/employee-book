@@ -27,7 +27,7 @@ class AppDb extends _$AppDb {
   AppDb() : super(_openConnection());
 
   @override 
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -40,9 +40,9 @@ class AppDb extends _$AppDb {
       if (from == 1) {
         await m.addColumn(employee, employee.isActive);
       }
-      if (from == 2) {
-        debugPrint('migration from 2 - 3');
+      if (from == 3) {       
         await m.createTable(employeeAddress);
+        debugPrint('migration from 3 - 4');
       }
     },
 

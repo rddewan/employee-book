@@ -53,4 +53,12 @@ class EmployeeAddressChangeNotifier extends ChangeNotifier {
 
     notifyListeners();
   }
+
+  void setIsAdded(bool value) {
+    _isAdded = value;
+  }
+
+  void setError() {
+    _error = '';
+  }
 }

@@ -1,5 +1,7 @@
 
+import 'package:employee_book/noifier/employee_address_change_notifier.dart';
 import 'package:employee_book/noifier/employee_change_notifier.dart';
+import 'package:employee_book/screen/employee_address_screen.dart';
 import 'package:employee_book/screen/employee_future.dart';
 import 'package:employee_book/screen/employee_notifier_future.dart';
 import 'package:employee_book/screen/employee_notifier_stream.dart';
@@ -19,7 +21,8 @@ class _HomeScreenState extends State<HomeScreen> {
   //late AppDb _db;
   final pages = const [
     EmployeeNotifierFutureScreen(),
-    EmployeeNotifierStreamScreen()
+    EmployeeNotifierStreamScreen(),
+    EmployeeAddressScreen()
     //EmployeeStreamScreen()
   ];
 
@@ -53,6 +56,9 @@ class _HomeScreenState extends State<HomeScreen> {
           if (value == 1) {
             context.read<EmployeeChangeNotifier>().getEmployeeStream();
           }
+          if (value == 2) {
+            context.read<EmployeeAddressChangeNotifier>().getAllEmployeeAddress();
+          }
           setState(() {
             index = value;
           });
@@ -72,6 +78,11 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Icon(Icons.list),
             activeIcon: Icon(Icons.list_outlined),
             label: 'Employee Stream'
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_city),
+            activeIcon: Icon(Icons.location_city_outlined),
+            label: 'Address'
           )
         ]),
     );

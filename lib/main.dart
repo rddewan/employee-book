@@ -1,7 +1,9 @@
 import 'package:employee_book/data/local/db/app_db.dart';
+import 'package:employee_book/noifier/employee_address_change_notifier.dart';
 import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:employee_book/route/route_generator.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -11,7 +13,14 @@ void main() {
         Provider.value(value: AppDb()),
         ChangeNotifierProxyProvider<AppDb,EmployeeChangeNotifier>(
           create: (context) => EmployeeChangeNotifier(), 
-          update: (context, db, notifier) => notifier!..initAppDb(db)..getEmployeeFuture())
+          update: (context, db, notifier) => notifier!..initAppDb(db)..getEmployeeFuture(),
+        ),
+        ChangeNotifierProxyProvider<AppDb,EmployeeAddressChangeNotifier>(
+          create: (context) => EmployeeAddressChangeNotifier(), 
+          update: (context,appDb,notifier) =>  notifier!..initAppDb(appDb),
+          lazy: true,
+        )
+                
       ],
       child: const MyApp(),      
     )
