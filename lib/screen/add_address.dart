@@ -34,7 +34,7 @@ final _formKey = GlobalKey<FormState>();
   void dispose() {
     _countryController.dispose();
     _streetController.dispose();
-    _addressChangeNotifier.removeListener(addAddress);
+    _addressChangeNotifier.removeListener(addressListener);
     super.dispose();
   }
   

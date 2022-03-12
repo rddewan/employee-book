@@ -38,7 +38,8 @@ class _AddEmployeeScreenState extends State<AddEmployeeScreen> {
     _userNameController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _dateOfBirthController.dispose();    
+    _dateOfBirthController.dispose();
+    _employeeChangeNotifier.removeListener(providerListener);    
     super.dispose();
   }
   

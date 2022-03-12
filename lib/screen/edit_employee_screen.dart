@@ -1,4 +1,5 @@
 import 'package:employee_book/data/local/db/app_db.dart';
+import 'package:employee_book/noifier/employee_address_change_notifier.dart';
 import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:employee_book/widget/custom_date_picker_form_field.dart';
 import 'package:employee_book/widget/custom_text_form_field.dart';
@@ -105,19 +106,34 @@ class _EditEmployeeScreenState extends State<EditEmployeeScreen> {
                           },
                         );
 
-                      },
-                      
-                    ),
-
-                        
+                      },                      
+                    ),                        
                     ],
                   )
-                );            
+                );           
 
               },
-
-            )
-                
+            ),
+            const  SizedBox(height: 16.0,),
+            Expanded(
+              child: Selector<EmployeeAddressChangeNotifier,List<emp_address>>(
+                selector: (context,notifier) => notifier.employeeList,
+                builder: (context, addressList,child) {
+                  return ListView.builder(
+                    itemCount: addressList.length,
+                    itemBuilder: (context, index){
+                      final address = addressList[index];
+            
+                      return ListTile(
+                        title: Text(address.street),
+                        subtitle: Text(address.country),
+                      );
+            
+                    }
+                  );
+                },
+              ),
+            ),
           ],
 
         ),

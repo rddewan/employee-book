@@ -1,4 +1,5 @@
 import 'package:employee_book/data/local/db/app_db.dart';
+import 'package:employee_book/noifier/employee_address_change_notifier.dart';
 import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -44,6 +45,8 @@ class _EmployeeNotifierStreamScreenState extends State<EmployeeNotifierStreamScr
               final employee = employees[index];
               return GestureDetector(
                 onTap: ()  {
+                  context.read<EmployeeChangeNotifier>().getSingleEmployee(employee.id);
+                  context.read<EmployeeAddressChangeNotifier>().getEmployeeAddress(employee.id);
                   Navigator.pushNamed(context, '/edit_employee',arguments: employee.id);
                 },
                 child: Card(
