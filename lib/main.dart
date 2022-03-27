@@ -3,7 +3,6 @@ import 'package:employee_book/noifier/employee_address_change_notifier.dart';
 import 'package:employee_book/noifier/employee_change_notifier.dart';
 import 'package:employee_book/route/route_generator.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -33,9 +32,10 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    print('object');
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
+      title: "Flutter Demo",
       theme: ThemeData(       
         primarySwatch: Colors.blue,
       ),
